@@ -1,5 +1,5 @@
 # virt-what
-# Copyright (C) 2008-2022 Red Hat Inc.
+# Copyright (C) 2008-2024 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-AC_INIT([virt-what],[1.25])
+AC_INIT([virt-what],[1.26])
 AM_INIT_AUTOMAKE([foreign])
 
 dnl Check for basic C environment.
@@ -49,6 +49,7 @@ tests="\
 	esx4.1 \
 	google-cloud \
 	hyperv \
+	hyperv-arm \
 	illumos-lx \
 	kvm \
 	kvm-explicit-cpu \
@@ -101,6 +102,7 @@ AC_CONFIG_FILES([Makefile
 	         tests/esx4.1/Makefile
 		 tests/google-cloud/Makefile
 	         tests/hyperv/Makefile
+	         tests/hyperv-arm/Makefile
 	         tests/illumos-lx/Makefile
 	         tests/kvm/Makefile
 	         tests/kvm-explicit-cpu/Makefile

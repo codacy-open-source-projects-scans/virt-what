@@ -1,5 +1,5 @@
 # Makefile for virt-what
-# Copyright (C) 2008-2011 Red Hat Inc.
+# Copyright (C) 2008-2024 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ AM_CPPFLAGS = -Wall
 
 CLEANFILES = virt-what *~
 
-EXTRA_DIST = .gitignore virt-what.in virt-what.pod
+EXTRA_DIST = .gitignore virt-what.in virt-what.pod virt-what-cvm.pod
 
 SUBDIRS = . tests
 
@@ -64,8 +64,8 @@ maintainer-check-extra-dist:
 # Commit everything in the current directory and set the commit
 # message to the current version number.
 maintainer-commit:
-	git commit -a -m "Version $(VERSION)."
+	git commit -a -m "Version $(VERSION)"
 
 # Tag HEAD with the current version.
 maintainer-tag:
-	git tag -a v$(VERSION) -m "Version $(VERSION)." -f
+	git tag -a v$(VERSION) -m "Version $(VERSION)" -f

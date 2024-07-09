@@ -1,4 +1,4 @@
-# Makefile for virt-what
+# Test for Microsoft HyperV.
 # Copyright (C) 2008-2024 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -15,6 +15,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-CLEANFILES = *~
+output="$(PATH=../..:$PATH virt-what --test-root=. 2>&1)"
+expected="hyperv"
 
-SUBDIRS = $(tests)
+if [ "$output" != "$expected" ]; then
+    echo "$0: test failed because output did not match expected"
+    echo "Expected output was:"
+    echo "----------------------------------------"
+    echo "$expected"
+    echo "----------------------------------------"
+    echo "But the actual output of the program was:"
+    echo "----------------------------------------"
+    echo "$output"
+    echo "----------------------------------------"
+    exit 1
+fi

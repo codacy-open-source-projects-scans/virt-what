@@ -24,5 +24,6 @@ EXTRA_DIST = \
 	proc/cpuinfo \
 	proc/self/status \
 	sbin/dmidecode \
+	sbin/timeout \
 	sbin/uname \
 	sbin/virt-what-cpuid-helper

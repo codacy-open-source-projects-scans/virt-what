@@ -1,6 +1,6 @@
 #!/bin/sh -
 # @configure_input@
-# Copyright (C) 2008-2022 Red Hat Inc.
+# Copyright (C) 2008-2024 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -115,11 +115,29 @@ arch=$(uname -m | sed -e 's/i.86/i386/' | sed -e 's/arm.*/arm/')
 
 # Check for Alibaba Cloud
 if echo "$dmi" | grep -q 'Manufacturer: Alibaba'; then
-    # Check for Alibaba Cloud ECS Bare Metal (EBM) Instance
-    if [ "x$root" = "x" ] && ( { echo -e "GET /latest/meta-datainstance/instance-type HTTP/1.0\r\nHost: 100.100.100.200\r\n\r" >&3; grep -sq 'ebm' <&3 ; } 3<> /dev/tcp/100.100.100.200/80 ) 2>/dev/null ; then
-        echo "alibaba_cloud-ebm"
+    if $(timeout --version >/dev/null 2>&1); then
+        timeout_cmd_prefix="timeout 1s"
+        timeout_cmp="-eq"
+        timeout_return_value=124
     else
+        timeout_cmd_prefix=""
+        timeout_cmp="-ne"
+        timeout_return_value=0
+    fi
+
+    # Check for Alibaba Cloud ECS Bare Metal (EBM) Instance
+    metadata=$($timeout_cmd_prefix sh -c '( { echo -e "GET /latest/meta-datainstance/instance-type HTTP/1.0\r\nHost: 100.100.100.200\r\n\r" >&3; grep -s 'ebm' <&3 ; } 3<> /dev/tcp/100.100.100.200/80 ) 2>/dev/null')
+    ret_value=$?
+    if [ $ret_value $timeout_cmp $timeout_return_value ]; then
+        # a timeout occurred when fetching metadata, assuming remote host unaccessible
+        # which means it might be a non-cloud environment, or test environment.
         echo "alibaba_cloud"
+    else
+        if [ -z "$metadata" ] ; then
+            echo "alibaba_cloud"
+        else
+            echo "alibaba_cloud-ebm"
+        fi
     fi
 fi
 
@@ -136,14 +154,22 @@ fi
 # http://blogs.msdn.com/b/sqlosteam/archive/2010/10/30/is-this-real-the-metaphysics-of-hardware-virtualization.aspx
 if [ "$cpuid" = "Microsoft Hv" ]; then
     echo hyperv
+# Hyper-V on ARM doesn't have CPUID.  Use the information in dmidecode
+# instead.  Note this is similar to VirtualPC below.
+elif echo "$dmi" | grep -q 'Manufacturer: Microsoft Corporation' &&
+     echo "$dmi" | grep -q 'Product Name: Virtual Machine' &&
+     echo "$dmi" | grep -q 'Version: Hyper-V'; then
+    echo hyperv
 fi
 
 # Check for VirtualPC.
-# The negative check for cpuid is to distinguish this from Hyper-V
-# which also has the same manufacturer string in the SM-BIOS data.
+# The negative check for cpuid & Hyper-V is to distinguish this from
+# Hyper-V above which also has the same manufacturer string in the
+# SM-BIOS data.
 if [ "$cpuid" != "Microsoft Hv" ] &&
     echo "$dmi" | grep -q 'Manufacturer: Microsoft Corporation' &&
-    echo "$dmi" | grep -q 'Product Name: Virtual Machine'; then
+    echo "$dmi" | grep -q 'Product Name: Virtual Machine' &&
+    ! echo "$dmi" | grep -q 'Version: Hyper-V'; then
     echo virtualpc
 fi
 

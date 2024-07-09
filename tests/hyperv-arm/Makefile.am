@@ -1,5 +1,5 @@
 # Makefile for virt-what
-# Copyright (C) 2008-2024 Red Hat Inc.
+# Copyright (C) 2008-2011 Red Hat Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,4 +17,12 @@
 
 CLEANFILES = *~
 
-SUBDIRS = $(tests)
+TESTS = test.sh
+
+EXTRA_DIST = \
+	test.sh \
+	proc/cpuinfo \
+	proc/self/status \
+	sbin/dmidecode \
+	sbin/uname \
+	sbin/virt-what-cpuid-helper
