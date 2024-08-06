@@ -50,7 +50,7 @@ Status: tested on Fedora 38 QEMU+KVM SEV-SNP (devel snapshot)
 
 This is a confidential guest running with Intel TDX technology
 
-Status: tested on Microsoft Azure TDX CVM (preview)
+Status: tested on Microsoft Azure TDX CVM
 
 =item B<hyperv-hcl>
 
@@ -58,7 +58,12 @@ This is a confidential guest running unenlightened under the
 HyperV (Azure) HCL (Host Compatibility Layer). This will be
 paired with B<amd-sev-snp>.
 
-Status: tested on Microsoft Azure SEV-SNP CVM
+Status: tested on Microsoft Azure SEV-SNP & TDX CVM
+
+=item B<s390x-protvirt>
+
+This is a confidential guest running on s390x with the
+Protected Virtualization (Secure Execution) technology
 
 =back
 

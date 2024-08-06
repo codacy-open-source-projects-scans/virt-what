@@ -92,6 +92,7 @@ static bool dodebug = false;
 
 #define CPUID_HYPERV_ISOLATION_TYPE_MASK 0xf
 #define CPUID_HYPERV_ISOLATION_TYPE_SNP 2
+#define CPUID_HYPERV_ISOLATION_TYPE_TDX 3
 
 #if defined(__x86_64__)
 
@@ -147,7 +148,7 @@ msr (off_t index)
 }
 
 static bool
-cpu_sig_amd_hyperv (void)
+cpu_sig_cvm_hyperv (uint32_t isoltype)
 {
   uint32_t eax, ebx, ecx, edx;
   char sig[13];
@@ -175,8 +176,7 @@ cpu_sig_amd_hyperv (void)
     ebx = ecx = edx = 0;
     cpuid(&eax, &ebx, &ecx, &edx);
 
-    if ((ebx & CPUID_HYPERV_ISOLATION_TYPE_MASK) ==
-	CPUID_HYPERV_ISOLATION_TYPE_SNP) {
+    if ((ebx & CPUID_HYPERV_ISOLATION_TYPE_MASK) == isoltype) {
       return true;
     }
   }
@@ -212,7 +212,7 @@ cpu_sig_amd (void)
   if (!(eax & (1 << 1))) {
     debug ("No sev in CPUID, try hyperv CPUID\n");
 
-    if (cpu_sig_amd_hyperv ()) {
+    if (cpu_sig_cvm_hyperv (CPUID_HYPERV_ISOLATION_TYPE_SNP)) {
       puts ("amd-sev-snp");
       puts ("hyperv-hcl");
     } else {
@@ -252,8 +252,12 @@ cpu_sig_intel (void)
   memset (sig, 0, sizeof sig);
   cpuid_leaf (CPUID_INTEL_TDX_ENUMERATION, sig, true);
 
-  if (memcmp (sig, CPUID_SIG_INTEL_TDX, sizeof(sig)) == 0)
+  if (memcmp (sig, CPUID_SIG_INTEL_TDX, sizeof(sig)) == 0) {
     puts ("intel-tdx");
+  } else if (cpu_sig_cvm_hyperv (CPUID_HYPERV_ISOLATION_TYPE_TDX)) {
+    puts ("intel-tdx");
+    puts ("hyperv-hcl");
+  }
 }
 
 static bool
@@ -291,7 +295,26 @@ cpu_sig (void)
     cpu_sig_intel ();
 }
 
-#else /* !x86_64 */
+#elif defined(__s390x__)
+
+#define SYSFS_PROT_VIRT "/sys/firmware/uv/prot_virt_guest"
+
+static void
+cpu_sig (void)
+{
+  int fd = open("/sys/firmware/uv/prot_virt_guest", O_RDONLY);
+  char c;
+  if (fd < 0)
+    return;
+
+  if (read(fd, &c, 1) == 1 && c == '1')
+    puts("s390-protvirt");
+
+  close(fd);
+}
+
+
+#else /* ! x86_64 && ! s390x */
 
 static void
 cpu_sig (void)
