@@ -60,7 +60,7 @@ paired with B<amd-sev-snp>.
 
 Status: tested on Microsoft Azure SEV-SNP & TDX CVM
 
-=item B<s390x-protvirt>
+=item B<s390-protvirt>
 
 This is a confidential guest running on s390x with the
 Protected Virtualization (Secure Execution) technology
