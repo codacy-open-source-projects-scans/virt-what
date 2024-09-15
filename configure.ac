@@ -59,6 +59,7 @@ tests="\
 	lkvm-arm \
 	lx86 \
 	lxc \
+        nspawn \
 	nutanix-ahv \
 	oci \
 	parallels-desktop \
@@ -112,6 +113,7 @@ AC_CONFIG_FILES([Makefile
 	         tests/lkvm-arm/Makefile
 	         tests/lx86/Makefile
 	         tests/lxc/Makefile
+	         tests/nspawn/Makefile
 	         tests/nutanix-ahv/Makefile
 	         tests/oci/Makefile
 	         tests/parallels-desktop/Makefile

@@ -270,6 +270,12 @@ The guest is running on the Red Hat hypervisor.
 
 Status: confirmed by RWMJ
 
+=item B<systemd_nspawn>
+
+This process is running in a systemd nspawn container.
+
+Status: contributed by Jochen Kellner
+
 =item B<uml>
 
 This is a User-Mode Linux (UML) guest.

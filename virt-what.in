@@ -238,6 +238,12 @@ elif grep -qF /libpod- "${root}/proc/self/cgroup" 2>/dev/null; then
     echo podman
 fi
 
+# Check for container=systemd-nspawn
+if [ -e "${root}/proc/1/environ" ] &&
+    cat "${root}/proc/1/environ" | tr '\000' '\n' | grep -Eiq '^container=systemd-nspawn'; then
+    echo systemd_nspawn
+fi
+
 # Check for Linux-VServer
 if test -e "${root}/proc/self/status" \
    && cat "${root}/proc/self/status" | grep -q "VxID: [0-9]*"; then
